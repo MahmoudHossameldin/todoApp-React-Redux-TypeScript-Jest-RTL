@@ -1,17 +1,28 @@
+import styles from './styles.module.css';
 import React from 'react';
 import TodoItem from '../TodoItem';
 import { Todo } from '../../types';
+import { useAppSelector } from '../../store';
 
-type TodoListProps = {
-  todos: Todo[];
-  toggleTodo: (id: number) => void;
-};
+const TodoList: React.FC = () => {
+  const todos = useAppSelector((state) => state.todos.todos);
+  const filter = useAppSelector((state) => state.filters.filter);
 
-const TodoList: React.FC<TodoListProps> = ({ todos, toggleTodo }) => {
+  const filteredTodos = (): Todo[] => {
+    switch (filter) {
+      case 'Active':
+        return todos.filter((todo) => !todo.done);
+      case 'Completed':
+        return todos.filter((todo) => todo.done);
+      default:
+        return todos;
+    }
+  };
+
   return (
     <ul>
-      {todos.map((todo) => (
-        <TodoItem key={todo.id} todo={todo} toggleTodo={toggleTodo} />
+      {filteredTodos().map((todo) => (
+        <TodoItem key={todo.id} todo={todo} />
       ))}
     </ul>
   );

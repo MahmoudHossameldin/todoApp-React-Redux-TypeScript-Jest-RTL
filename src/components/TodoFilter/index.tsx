@@ -1,28 +1,33 @@
 import React from 'react';
+import { useAppSelector, useAppDispatch } from '../../store';
+import { setFilter } from '../../store/slices/filtersSlice';
+import { FilterState } from '../../types';
 import styles from './styles.module.css';
 
-type TodoFilterProps = {
-  setFilter: (filter: string) => void;
-  activeFilter: string;
-};
+const TodoFilter: React.FC = () => {
+  const activeFilter = useAppSelector((state) => state.filters.filter);
+  const dispatch = useAppDispatch();
 
-const TodoFilter: React.FC<TodoFilterProps> = ({ setFilter, activeFilter }) => {
+  const handleSetFilter = (filter: FilterState) => {
+    dispatch(setFilter(filter));
+  };
+
   return (
     <div>
       <button
-        onClick={() => setFilter('All')}
+        onClick={() => handleSetFilter('All')}
         className={activeFilter === 'All' ? styles.active : ''}
       >
         All
       </button>
       <button
-        onClick={() => setFilter('Active')}
+        onClick={() => handleSetFilter('Active')}
         className={activeFilter === 'Active' ? styles.active : ''}
       >
         Active
       </button>
       <button
-        onClick={() => setFilter('Completed')}
+        onClick={() => handleSetFilter('Completed')}
         className={activeFilter === 'Completed' ? styles.active : ''}
       >
         Completed

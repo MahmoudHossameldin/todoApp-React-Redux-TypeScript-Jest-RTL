@@ -1,17 +1,21 @@
 import React, { useState, KeyboardEvent, ChangeEvent } from 'react';
+import { useAppDispatch } from '../../store/index';
+import { addTodo } from '../../store/slices/todosSlice';
 import styles from './styles.module.css';
 
-type TodoInputProps = {
-  addTodo: (text: string) => void;
-};
-
-const TodoInput: React.FC<TodoInputProps> = ({ addTodo }) => {
+const TodoInput: React.FC = () => {
   const [currentTodo, setCurrentTodo] = useState<string>('');
+  const dispatch = useAppDispatch();
 
   const handleKeyPress = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       if (currentTodo.trim() !== '') {
-        addTodo(currentTodo);
+        const newTodo = {
+          id: new Date().getTime(),
+          text: currentTodo,
+          done: false,
+        };
+        dispatch(addTodo(newTodo));
         setCurrentTodo('');
       }
     }

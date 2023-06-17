@@ -1,25 +1,25 @@
 import React from 'react';
-import styles from './styles.module.css';
+import { useAppSelector, useAppDispatch } from '../../store';
+import { clearCompletedTodos } from '../../store/slices/todosSlice';
+
 import TodoFilter from '../TodoFilter';
+import styles from './styles.module.css';
 
-type FooterProps = {
-  count: number;
-  clearCompletedTodos: () => void;
-  setFilter: (filter: string) => void;
-  activeFilter: string;
-};
+const Footer: React.FC = () => {
+  const todos = useAppSelector((state) => state.todos.todos);
+  const dispatch = useAppDispatch();
 
-const Footer: React.FC<FooterProps> = ({
-  count,
-  clearCompletedTodos,
-  setFilter,
-  activeFilter,
-}) => {
+  const count = todos.filter((todo) => !todo.done).length;
+
+  const handleClearCompletedTodos = () => {
+    dispatch(clearCompletedTodos());
+  };
+
   return (
     <footer>
       <p className={styles.count}>{count} items left</p>
-      <TodoFilter activeFilter={activeFilter} setFilter={setFilter} />
-      <button onClick={clearCompletedTodos}>Clear completed</button>
+      <TodoFilter />
+      <button onClick={handleClearCompletedTodos}>Clear completed</button>
     </footer>
   );
 };
