@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Todo } from '../../types';
 
-interface TodosSliceState {
+type TodosSliceState = {
   todos: Todo[];
-}
+};
 
 const initialState: TodosSliceState = {
   todos: [],

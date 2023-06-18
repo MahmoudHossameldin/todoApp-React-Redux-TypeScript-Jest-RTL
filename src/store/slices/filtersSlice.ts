@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FilterState } from '../../types';
 
-interface FiltersState {
+type FiltersState = {
   filter: FilterState;
-}
+};
 
 const initialState: FiltersState = {
   filter: 'All',
