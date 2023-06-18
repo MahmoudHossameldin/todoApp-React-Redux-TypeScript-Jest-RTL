@@ -1,23 +1,47 @@
-export {};
-// import React from 'react';
-// import { render, fireEvent } from '@testing-library/react';
-// import TodoList from './';
+import React from 'react';
+import { render, RenderResult } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import configureStore, { MockStore } from 'redux-mock-store';
+import TodoList from './';
+import { RootState } from '../../store';
+import { Todo } from '../../types';
 
-// describe('TodoList component', () => {
-//   test('renders the list of todos', () => {
-//     const todos = [
-//       { id: 1, text: 'Todo 1', done: false },
-//       { id: 2, text: 'Todo 2', done: true },
-//     ];
-//     const toggleTodo = jest.fn();
-//     const { getByText } = render(
-//       <TodoList todos={todos} toggleTodo={toggleTodo} />
-//     );
+const mockStore = configureStore<RootState>();
 
-//     const todo1 = getByText('Todo 1');
-//     const todo2 = getByText('Todo 2');
+describe('TodoList', () => {
+  let store: MockStore<RootState>;
+  let component: RenderResult;
+  let mockTodos: Todo[];
 
-//     expect(todo1).toBeInTheDocument();
-//     expect(todo2).toBeInTheDocument();
-//   });
-// });
+  beforeEach(() => {
+    mockTodos = [
+      { id: 1, text: 'Todo 1', done: false },
+      { id: 2, text: 'Todo 2', done: true },
+      { id: 3, text: 'Todo 3', done: false },
+    ];
+
+    store = mockStore({
+      todos: {
+        todos: mockTodos,
+      },
+      filters: {
+        filter: 'All',
+      },
+    });
+
+    component = render(
+      <Provider store={store}>
+        <TodoList />
+      </Provider>
+    );
+  });
+
+  it('renders the list of todos', () => {
+    const listElement = component.container.querySelector('ul');
+
+    expect(listElement).toBeInTheDocument();
+
+    const todoItems = component.container.querySelectorAll('li');
+    expect(todoItems.length).toBe(mockTodos.length);
+  });
+});

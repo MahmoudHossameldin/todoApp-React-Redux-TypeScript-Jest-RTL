@@ -1,28 +1,65 @@
-export {};
-// import React from 'react';
-// import { render, fireEvent } from '@testing-library/react';
-// import TodoInput from './';
+import React from 'react';
+import { render, fireEvent, RenderResult } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import configureStore, { MockStore } from 'redux-mock-store';
+import TodoInput from './';
+import { addTodo } from '../../store/slices/todosSlice';
+import { RootState } from '../../store';
 
-// describe('TodoInput component', () => {
-//   test('calls addTodo when Enter key is pressed with a non-empty input', () => {
-//     const addTodo = jest.fn();
-//     const { getByPlaceholderText } = render(<TodoInput addTodo={addTodo} />);
+const mockStore = configureStore<RootState>();
 
-//     const inputElement = getByPlaceholderText('Add a todo...');
-//     fireEvent.change(inputElement, { target: { value: 'New todo item' } });
-//     fireEvent.keyUp(inputElement, { key: 'Enter' });
+describe('TodoInput', () => {
+  let store: MockStore<RootState>;
+  let component: RenderResult;
 
-//     expect(addTodo).toHaveBeenCalledWith('New todo item');
-//   });
+  beforeEach(() => {
+    store = mockStore({
+      filters: {
+        filter: 'All',
+      },
+      todos: {
+        todos: [],
+      },
+    });
 
-//   test('does not call addTodo when Enter key is pressed with an empty input', () => {
-//     const addTodo = jest.fn();
-//     const { getByPlaceholderText } = render(<TodoInput addTodo={addTodo} />);
+    component = render(
+      <Provider store={store}>
+        <TodoInput />
+      </Provider>
+    );
+  });
 
-//     const inputElement = getByPlaceholderText('Add a todo...');
-//     fireEvent.change(inputElement, { target: { value: '' } });
-//     fireEvent.keyUp(inputElement, { key: 'Enter' });
+  it('calls addTodo when Enter key is pressed with a non-empty input', () => {
+    store.dispatch = jest.fn();
 
-//     expect(addTodo).not.toHaveBeenCalled();
-//   });
-// });
+    const inputElement = component.getByPlaceholderText(
+      'Add a todo...'
+    ) as HTMLInputElement;
+
+    fireEvent.change(inputElement, { target: { value: 'New Todo' } });
+
+    fireEvent.keyUp(inputElement, { key: 'Enter' });
+
+    expect(store.dispatch).toHaveBeenCalledWith(
+      addTodo({
+        id: expect.any(Number),
+        text: 'New Todo',
+        done: false,
+      })
+    );
+  });
+
+  it('does not call addTodo when Enter key is pressed with an empty input', () => {
+    store.dispatch = jest.fn();
+
+    const inputElement = component.getByPlaceholderText(
+      'Add a todo...'
+    ) as HTMLInputElement;
+
+    fireEvent.change(inputElement, { target: { value: '' } });
+
+    fireEvent.keyUp(inputElement, { key: 'Enter' });
+
+    expect(store.dispatch).not.toHaveBeenCalledWith(addTodo(expect.anything()));
+  });
+});

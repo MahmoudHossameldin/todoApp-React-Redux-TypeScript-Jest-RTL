@@ -1,74 +1,77 @@
-export {};
-// import React from 'react';
-// import { render, fireEvent } from '@testing-library/react';
-// import Footer from './';
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import configureStore, { MockStoreEnhanced } from 'redux-mock-store';
+import Footer from './';
+import { clearCompletedTodos } from '../../store/slices/todosSlice';
+import { setFilter } from '../../store/slices/filtersSlice';
+import { RootState, AppDispatch } from '../../store';
 
-// describe('Footer component', () => {
-//   test('displays the count of remaining todos', () => {
-//     const count = 5; // Set the count of remaining todos for testing
-//     const clearCompletedTodos = jest.fn();
-//     const setFilter = jest.fn();
-//     const activeFilter = 'All';
+const mockStore = configureStore<RootState, AppDispatch>([]);
 
-//     const { getByText } = render(
-//       <Footer
-//         count={count}
-//         clearCompletedTodos={clearCompletedTodos}
-//         setFilter={setFilter}
-//         activeFilter={activeFilter}
-//       />
-//     );
+describe('Footer', () => {
+  let store: MockStoreEnhanced<RootState, AppDispatch>;
 
-//     const countElement = getByText(`${count} items left`);
-//     expect(countElement).toBeInTheDocument();
-//   });
+  beforeEach(() => {
+    store = mockStore({
+      todos: {
+        todos: [
+          { id: 1, text: 'Todo 1', done: false },
+          { id: 2, text: 'Todo 2', done: true },
+        ],
+      },
+      filters: {
+        filter: 'All',
+      },
+    });
+  });
 
-//   test('calls clearCompletedTodos when "Clear completed" button is clicked', () => {
-//     const count = 5;
-//     const clearCompletedTodos = jest.fn();
-//     const setFilter = jest.fn();
-//     const activeFilter = 'All';
+  it('displays the count of remaining todos', () => {
+    render(
+      <Provider store={store}>
+        <Footer />
+      </Provider>
+    );
 
-//     const { getByText } = render(
-//       <Footer
-//         count={count}
-//         clearCompletedTodos={clearCompletedTodos}
-//         setFilter={setFilter}
-//         activeFilter={activeFilter}
-//       />
-//     );
+    const countElement = screen.getByText(/1 items left/i);
+    expect(countElement).toBeInTheDocument();
+  });
 
-//     const clearButton = getByText('Clear completed');
-//     fireEvent.click(clearButton);
-//     expect(clearCompletedTodos).toHaveBeenCalled();
-//   });
+  it('calls clearCompletedTodos when "Clear completed" button is clicked', () => {
+    store.dispatch = jest.fn();
 
-//   test('calls setFilter with the correct filter when filter buttons are clicked', () => {
-//     const count = 5;
-//     const clearCompletedTodos = jest.fn();
-//     const setFilter = jest.fn();
-//     const activeFilter = 'All';
+    render(
+      <Provider store={store}>
+        <Footer />
+      </Provider>
+    );
 
-//     const { getByText } = render(
-//       <Footer
-//         count={count}
-//         clearCompletedTodos={clearCompletedTodos}
-//         setFilter={setFilter}
-//         activeFilter={activeFilter}
-//       />
-//     );
+    const clearButton = screen.getByText(/clear completed/i);
+    fireEvent.click(clearButton);
 
-//     const allButton = getByText('All');
-//     const activeButton = getByText('Active');
-//     const completedButton = getByText('Completed');
+    expect(store.dispatch).toHaveBeenCalledWith(clearCompletedTodos());
+  });
 
-//     fireEvent.click(allButton);
-//     expect(setFilter).toHaveBeenCalledWith('All');
+  it('calls setFilter with the correct filter when filter buttons are clicked', () => {
+    store.dispatch = jest.fn();
 
-//     fireEvent.click(activeButton);
-//     expect(setFilter).toHaveBeenCalledWith('Active');
+    render(
+      <Provider store={store}>
+        <Footer />
+      </Provider>
+    );
 
-//     fireEvent.click(completedButton);
-//     expect(setFilter).toHaveBeenCalledWith('Completed');
-//   });
-// });
+    const allButton = screen.getByText('All');
+    const activeButton = screen.getByText('Active');
+    const completedButton = screen.getByText('Completed');
+
+    fireEvent.click(activeButton);
+    expect(store.dispatch).toHaveBeenCalledWith(setFilter('Active'));
+
+    fireEvent.click(completedButton);
+    expect(store.dispatch).toHaveBeenCalledWith(setFilter('Completed'));
+
+    fireEvent.click(allButton);
+    expect(store.dispatch).toHaveBeenCalledWith(setFilter('All'));
+  });
+});

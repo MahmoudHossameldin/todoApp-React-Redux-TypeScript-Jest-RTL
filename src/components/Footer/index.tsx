@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { clearCompletedTodos } from '../../store/slices/todosSlice';
-
 import TodoFilter from '../TodoFilter';
 import styles from './styles.module.css';
 
