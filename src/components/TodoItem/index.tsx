@@ -11,22 +11,24 @@ type TodoItemProps = {
 const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
   const dispatch = useAppDispatch();
 
-  const handleToggleTodo = (id: number) => {
-    dispatch(toggleTodo(id));
+  const handleToggleTodo = () => {
+    dispatch(toggleTodo(todo.id));
   };
 
   return (
     <div className={styles.group}>
       <li className={`${todo.done ? styles.done : ''}`}>
-        <input
-          type='checkbox'
-          checked={todo.done}
-          onChange={() => handleToggleTodo(todo.id)}
-          className={styles.checkbox}
-          id='checkTodo'
-          data-testid='todo-checkbox'
-        />
-        <p className={styles.text}>{todo.text}</p>
+        <label htmlFor={`todo-checkbox-${todo.id}`}>
+          <input
+            type='checkbox'
+            checked={todo.done}
+            onChange={handleToggleTodo}
+            className={styles.checkbox}
+            id={`todo-checkbox-${todo.id}`}
+            data-testid='todo-checkbox'
+          />
+          <p className={styles.text}>{todo.text}</p>
+        </label>
       </li>
     </div>
   );
