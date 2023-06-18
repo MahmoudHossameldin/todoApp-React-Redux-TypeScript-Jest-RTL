@@ -1,4 +1,3 @@
-import styles from './styles.module.css';
 import React from 'react';
 import TodoItem from '../TodoItem';
 import { Todo } from '../../types';
